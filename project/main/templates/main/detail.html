@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title }}</title>
+</head>
+<body>
+ {% for car in cars %}
+     <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
+     <p>Nomi:<i> {{ car.name }}</i></p>
+     <p>Narhi: <i>{{ car.price }}</i></p>
+     <p>Rangi: <i>{{ car.color }}</i></p>
+     <p>Ko'rinishi: 👇</p>
+     {% if car.image %}
+     <img src="{{ car.image.url }}" class="d-block w-100" alt="{{ car.name }}">
+     {% endif %} </div>
+ {% endfor %}
+</body>
+</html>

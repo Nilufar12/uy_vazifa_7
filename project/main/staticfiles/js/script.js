@@ -1,1 +1,1 @@
-alert('Salom Dunyo')
+//alert('Salom Dunyo')

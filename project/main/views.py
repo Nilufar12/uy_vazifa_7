@@ -23,10 +23,11 @@ def brand_cars(request, brand_id):
     context = {
         'brand': brand,
         'cars': cars,
-        "brands": Brand.objects.all()
+        "brands": Brand.objects.all(),
+        'title': brand.model
     }
 
-    return render(request, 'main/home.html', context)
+    return render(request, 'main/detail.html', context)
 
 
 def car_detail(request, car_id):
@@ -34,6 +35,11 @@ def car_detail(request, car_id):
 
     context = {
         "car": car,
-        "brands": Brand.objects.all()
+        "brands": Brand.objects.all(),
+        'title': car.name
     }
-    return render(request, 'main/home.html', context)
+    return render(request, 'main/detail.html', context)
+
+def add_car(request: HttpRequest):
+    print(request.POST)
+    return render(request, 'main/add_car.html')
