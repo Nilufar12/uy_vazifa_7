@@ -8,15 +8,26 @@
     <title>{{ title }}</title>
 </head>
 <body>
- {% for car in cars %}
-     <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
-     <p>Nomi:<i> {{ car.name }}</i></p>
-     <p>Narhi: <i>{{ car.price }}</i></p>
-     <p>Rangi: <i>{{ car.color }}</i></p>
-     <p>Ko'rinishi: 👇</p>
-     {% if car.image %}
-     <img src="{{ car.image.url }}" class="d-block w-100" alt="{{ car.name }}">
-     {% endif %} </div>
- {% endfor %}
+{% if cars %}
+    {% for car in cars %}
+        <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
+        <p>Nomi:<i> {{ car.name }}</i></p>
+        <p>Narhi: <i>{{ car.price }}</i></p>
+        <p>Rangi: <i>{{ car.color }}</i></p>
+        <p>Ko'rinishi: 👇</p>
+        {% if car.image %}
+            <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
+        {% endif %}
+    {% endfor %}
+{% elif car %}
+    <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
+    <p>Nomi:<i> {{ car.name }}</i></p>
+    <p>Narhi: <i>{{ car.price }}</i></p>
+    <p>Rangi: <i>{{ car.color }}</i></p>
+    <p>Ko'rinishi: 👇</p>
+    {% if car.image %}
+            <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
+    {% endif %}
+{% endif %}
 </body>
 </html>

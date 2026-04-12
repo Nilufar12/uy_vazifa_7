@@ -6,10 +6,9 @@
     <title>AddCar</title>
 </head>
 <body>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="text" placeholder="Mashina Nomi", name="name">
-        <textarea placeholder="Mashina haqida" name="description"></textarea>
+        {{ form.as_p }}
 
         <button type="submit">Saqlamoq</button>
     </form>

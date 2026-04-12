@@ -1,6 +1,7 @@
 from django.http import HttpRequest
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
+from .forms import CarForm
 from .models import Brand, Car
 
 
@@ -40,6 +41,15 @@ def car_detail(request, car_id):
     }
     return render(request, 'main/detail.html', context)
 
+
 def add_car(request: HttpRequest):
-    print(request.POST)
-    return render(request, 'main/add_car.html')
+    if request.method == 'POST':
+        form = CarForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            car = form.save()
+            return redirect('car_detail', car_id=car.id)
+    form = CarForm()
+    context = {
+        'form': form
+    }
+    return render(request, 'main/add_car.html', context)
