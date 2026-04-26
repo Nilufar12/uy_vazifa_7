@@ -28,6 +28,13 @@
     {% if car.image %}
             <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
     {% endif %}
+<div class="card-body">
+    <form method="post">
+        {% csrf_token%}
+        {{ form.as_p }}
+        <button class="btn btn-success">Saqlash</button>
+    </form>
+</div>
 {% endif %}
 </body>
 </html>
