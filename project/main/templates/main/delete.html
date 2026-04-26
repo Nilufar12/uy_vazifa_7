@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Siz bu mashina haqida ma'lumotlarni o'chirmoqchimisiz?</h1>
+<form method="post">
+    {% csrf_token %}
+
+    <button type="submit">Delete</button>
+</form>
+<a href="{% url 'car_detail' car.id%}">Cancel</a>
+</body>
+</html>

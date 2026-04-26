@@ -60,7 +60,11 @@ def update_car(request, pk: int):
         if form.is_valid():
             form.save()
             return redirect('car_detail', car_id=car.id)
+<<<<<<< HEAD
     else:
+=======
+    else: 
+>>>>>>> 8981af38019b4f4c740adc9fb5fd68fdb80d58e8
         form = CarForm(instance=car)
 
     return render(request, 'main/update_car.html', {'form': form})
@@ -74,8 +78,12 @@ def delete_car(request, pk):
     context = {
         'car': car
     }
+<<<<<<< HEAD
     return render(request, 'main/delete.html', context)
 
 
 def create_comment(request):
     pass
+=======
+    return render(request, 'main/delete.html', context)
+>>>>>>> 8981af38019b4f4c740adc9fb5fd68fdb80d58e8
