@@ -1,18 +1,15 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Car, Brand
+from .models import Car, Brand, Comment
 
 
 class CarForm(forms.ModelForm):
     class Meta:
         model = Car
         # fields = '__all__'
-<<<<<<< HEAD
         fields = ['name', 'price', 'color', 'image', 'video', 'brand']
-=======
         fields = ['name', 'price', 'color', 'image', 'brand']
->>>>>>> 8981af38019b4f4c740adc9fb5fd68fdb80d58e8
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control'
@@ -32,7 +29,6 @@ class CarForm(forms.ModelForm):
             })
         }
 
-<<<<<<< HEAD
     def clean_price(self):
         price = self.cleaned_data.get('price')
         if price <= 0:
@@ -58,15 +54,8 @@ class CarForm(forms.ModelForm):
     #         raise ValidationError('Car nomi kichik xarflarda bo\'lsin!!!')
 
 
-class CommentForm(forms.Form):
-    text = forms.CharField(max_length=500)
-=======
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('text',)
 
-
-
-
-
-
-
-
->>>>>>> 8981af38019b4f4c740adc9fb5fd68fdb80d58e8

@@ -1,8 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
 from django.shortcuts import render, redirect
+from django.template.context_processors import request
 
 from .forms import CarForm, CommentForm
-from .models import Brand, Car
+from .models import Brand, Car, Comment
 
 
 def home(request: HttpRequest):
@@ -11,7 +13,7 @@ def home(request: HttpRequest):
 
     context = {
         'cars': cars,
-        "brands": Brand.objects.all()
+        "brands": brands
     }
     return render(request, 'main/home.html', context)
 
@@ -32,11 +34,13 @@ def brand_cars(request, brand_id):
 
 def car_detail(request, car_id):
     car = Car.objects.get(id=car_id)
+    comments = Comment.objects.filter(car=car)
     context = {
         "car": car,
         "brands": Brand.objects.all(),
         'title': car.name,
-        'form': CommentForm()
+        'form': CommentForm(),
+        'comments': comments
     }
     return render(request, 'main/detail.html', context)
 
@@ -60,13 +64,8 @@ def update_car(request, pk: int):
         if form.is_valid():
             form.save()
             return redirect('car_detail', car_id=car.id)
-<<<<<<< HEAD
     else:
-=======
-    else: 
->>>>>>> 8981af38019b4f4c740adc9fb5fd68fdb80d58e8
         form = CarForm(instance=car)
-
     return render(request, 'main/update_car.html', {'form': form})
 
 
@@ -78,12 +77,48 @@ def delete_car(request, pk):
     context = {
         'car': car
     }
-<<<<<<< HEAD
     return render(request, 'main/delete.html', context)
 
 
-def create_comment(request):
-    pass
-=======
-    return render(request, 'main/delete.html', context)
->>>>>>> 8981af38019b4f4c740adc9fb5fd68fdb80d58e8
+def create_comment(request, car_id: int):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = CommentForm(data=request.POST)
+            if form.is_valid():
+                car = Car.objects.get(pk=car_id)
+                comment = form.save(commit=False)
+                comment.car = car
+                comment.user = request.user
+                comment.save()
+        return redirect('car_detail', car_id)
+    else:
+        return redirect('home')
+
+
+def update_comment(request: HttpRequest, comment_id: int):
+    comment = Comment.objects.get(pk=comment_id)
+    if request.method == 'POST':
+        form = CommentForm(data=request.POST, instance=comment)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.edited = True
+            comment.save()
+            return redirect('car_detail', car_id=comment.car.id)
+
+    else:
+        form = CommentForm(instance=comment)
+        context = {
+            'form': form
+        }
+    return render(request, 'main/update_comment.html', context)
+
+
+@login_required(login_url='home')
+def delete_comment(request: HttpRequest, comment_id: int, car_id: int):
+    comment = Comment.objects.get(pk=comment_id)
+    if comment.user == request.user or request.user.is_superuser:
+        comment.delete()
+    return redirect('car_detail', car_id=comment.car.id)
+
+
+

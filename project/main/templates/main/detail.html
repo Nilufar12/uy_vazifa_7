@@ -9,32 +9,64 @@
 </head>
 <body>
 {% if cars %}
-    {% for car in cars %}
-        <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
-        <p>Nomi:<i> {{ car.name }}</i></p>
-        <p>Narhi: <i>{{ car.price }}</i></p>
-        <p>Rangi: <i>{{ car.color }}</i></p>
-        <p>Ko'rinishi: 👇</p>
-        {% if car.image %}
-            <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
-        {% endif %}
-    {% endfor %}
+{% for car in cars %}
+    <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
+    <p>Nomi:<i> {{ car.name }}</i></p>
+    <p>Narhi: <i>{{ car.price }}</i></p>
+    <p>Rangi: <i>{{ car.color }}</i></p>
+    <p>Ko'rinishi: 👇</p>
+{% if car.image %}
+    <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
+{% endif %}
+{% endfor %}
 {% elif car %}
     <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
     <p>Nomi:<i> {{ car.name }}</i></p>
     <p>Narhi: <i>{{ car.price }}</i></p>
     <p>Rangi: <i>{{ car.color }}</i></p>
     <p>Ko'rinishi: 👇</p>
-    {% if car.image %}
-            <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
-    {% endif %}
+{% if car.image %}
+    <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
+{% endif %}
+
 <div class="card-body">
+    {% if request.user.is_authenticated %}
     <form method="post">
         {% csrf_token%}
         {{ form.as_p }}
         <button class="btn btn-success">Saqlash</button>
     </form>
+    {% else %}
+    <p>Izoh qoldirish uchun login qiling!!!<a href="">Login</a></p>
+    {% endif %}
 </div>
+{% for comment in comments %}
+<div class="card mb-3">
+    <div class="card-body">
+        <p class="mb-2">{{ comment.text }}</p>
+
+        <div class="d-flex justify-content-end align-items-center">
+
+            {% if comment.edited %}
+                <p class="text-muted me-3">(Tahrirlangan)</p>
+            {% endif %}
+
+            <p class="text-muted me-3">{{ comment.created|date:"d.m.Y H:i" }}</p>
+
+
+                by: <a href="#">{{ comment.user.username }}</a>
+
+                {% if comment.user == request.user %}
+                    <a href="{% url 'update_comment' comment.id %}" class="ms-2">✍️</a>
+                {% endif %}
+
+                {% if comment.user == request.user or request.user.is_superuser %}
+                    <a href="{% url 'delete_comment' comment.id car.id %}" class="ms-2">🗑</a>
+                {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
 {% endif %}
 </body>
 </html>
