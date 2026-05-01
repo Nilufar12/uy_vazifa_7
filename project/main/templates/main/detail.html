@@ -1,72 +1,62 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ title }}</title>
-</head>
-<body>
-{% if cars %}
-{% for car in cars %}
-    <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
-    <p>Nomi:<i> {{ car.name }}</i></p>
-    <p>Narhi: <i>{{ car.price }}</i></p>
-    <p>Rangi: <i>{{ car.color }}</i></p>
-    <p>Ko'rinishi: 👇</p>
-{% if car.image %}
-    <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
-{% endif %}
-{% endfor %}
-{% elif car %}
-    <p><b>Avtomobil: <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a></b></p>
-    <p>Nomi:<i> {{ car.name }}</i></p>
-    <p>Narhi: <i>{{ car.price }}</i></p>
-    <p>Rangi: <i>{{ car.color }}</i></p>
-    <p>Ko'rinishi: 👇</p>
-{% if car.image %}
-    <img src="{{ car.image.url }}" class="img-thumbnail" style="height: 250px; object-fit: cover;" alt="{{ car.name }}">
-{% endif %}
+{% extends 'base.html' %}
 
-<div class="card-body">
-    {% if request.user.is_authenticated %}
-    <form method="post">
-        {% csrf_token%}
-        {{ form.as_p }}
-        <button class="btn btn-success">Saqlash</button>
-    </form>
-    {% else %}
-    <p>Izoh qoldirish uchun login qiling!!!<a href="">Login</a></p>
-    {% endif %}
-</div>
-{% for comment in comments %}
-<div class="card mb-3">
-    <div class="card-body">
-        <p class="mb-2">{{ comment.text }}</p>
+{% block main %}
+<style>
+    .car-card { position: relative; border-radius: 15px; overflow: hidden; transition: 0.3s; border: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .car-card:hover { transform: translateY(-5px); }
+    .car-img-wrapper { position: relative; height: 200px; }
+    .car-img { width: 100%; height: 100%; object-fit: cover; }
+    .fav-btn {
+        position: absolute; top: 12px; right: 12px;
+        background: rgba(255, 255, 255, 0.85); border: none;
+        border-radius: 50%; width: 34px; height: 34px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; z-index: 5;
+        transition: 0.2s;
+    }
+    .heart-icon { color: #555; font-size: 18px; line-height: 1; text-decoration: none; }
+    /* Qizil rang uchun klass */
+    .is-favorite { color: #e74c3c !important; }
+</style>
 
-        <div class="d-flex justify-content-end align-items-center">
+<div class="container mt-4">
+    <h2 class="mb-4">{{ brand.name }}</h2>
+    <div class="row">
+        {% for car in cars %}
+        <div class="col-md-4 mb-4">
+            <div class="card car-card h-100">
+                <div class="car-img-wrapper">
+                    <div class="car-img-wrapper">
+                        {% if car.image %}
+                        <img src="{{ car.image.url }}" class="car-img" alt="{{ car.name }}">
+                        {% endif %}
 
-            {% if comment.edited %}
-                <p class="text-muted me-3">(Tahrirlangan)</p>
-            {% endif %}
-
-            <p class="text-muted me-3">{{ comment.created|date:"d.m.Y H:i" }}</p>
-
-
-                by: <a href="#">{{ comment.user.username }}</a>
-
-                {% if comment.user == request.user %}
-                    <a href="{% url 'update_comment' comment.id %}" class="ms-2">✍️</a>
-                {% endif %}
-
-                {% if comment.user == request.user or request.user.is_superuser %}
-                    <a href="{% url 'delete_comment' comment.id car.id %}" class="ms-2">🗑</a>
-                {% endif %}
+                        <a href="{% url 'add_carmark' car.id %}" class="fav-btn" style="text-decoration: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 width="20" height="20"
+                                 viewBox="0 0 24 24"
+                            fill="{% if car.like %}#e53935{% else %}none{% endif %}"
+                            stroke="{% if car.like %}#e53935{% else %}#555{% endif %}"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="fw-bold">
+                        <a href="{% url 'car_detail' car.id %}" class="text-dark text-decoration-none">{{ car.name }}</a>
+                    </h5>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">{{ car.color }}</span>
+                        <span class="text-success fw-bold">{{ car.price }} $</span>
+                    </div>
+                </div>
+            </div>
         </div>
+        {% endfor %}
     </div>
 </div>
-{% endfor %}
-{% endif %}
-</body>
-</html>
+{% endblock main %}

@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .views import home, brand_cars, car_detail, add_car, update_car, delete_car, create_comment, update_comment, \
-    delete_comment
+    delete_comment, add_carmark
 
 urlpatterns = [
     path('', home, name='home'),
@@ -13,4 +13,6 @@ urlpatterns = [
     path('cars/add/comment/<int:car_id>/', create_comment, name='create_comment'),
     path('cars/update/comment/<int:comment_id>/', update_comment, name='update_comment'),
     path('cars/delete/comment/<int:comment_id>/<int:car_id>/', delete_comment, name='delete_comment'),
+    path('cars/add/carmark/<int:car_id>/', add_carmark, name='add_carmark'),
+
 ]

@@ -6,7 +6,9 @@
         </a>
 
         <a href="{% url 'add_car' %}" class="nav-link me-auto ms-3">Mashina qo'shish</a>
-
+        {% if request.user.is_authenticated and request.path in '/' %}
+            <a href="{% url 'home' %}?cars=mine" class="nav-link me-auto ms-3">Tanlanganlar</a>
+        {% endif %}
         <form class="d-flex" role="search">
             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
             <button class="btn btn-outline-success" type="submit">Qidirish</button>

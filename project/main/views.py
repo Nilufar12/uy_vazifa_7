@@ -1,19 +1,38 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
-from django.shortcuts import render, redirect
-from django.template.context_processors import request
+from django.shortcuts import render, redirect, get_object_or_404
+
 
 from .forms import CarForm, CommentForm
-from .models import Brand, Car, Comment
+from .models import Brand, Car, Comment, CarMark
 
 
 def home(request: HttpRequest):
     brands = Brand.objects.all()
-    cars = Car.objects.all()
+
+    if request.user.is_authenticated:
+        if request.GET.get('cars'):
+            cars = []
+            carmarks = CarMark.objects.filter(user=request.user)
+            for carmark in carmarks:
+                car = carmark.car
+                car.like = True
+                cars.append(car)
+        else:
+            cars = Car.objects.all()
+            if request.user.is_authenticated:
+                for car in cars:
+                    res = car.carmarks.filter(user=request.user).exists()
+                    if res:
+                        car.like = True
+
+    else:
+        cars = Car.objects.all()
 
     context = {
         'cars': cars,
-        "brands": brands
+        "brands": brands,
+        'title': 'Avtosalon'
     }
     return render(request, 'main/home.html', context)
 
@@ -21,6 +40,11 @@ def home(request: HttpRequest):
 def brand_cars(request, brand_id):
     brand = Brand.objects.get(id=brand_id)
     cars = Car.objects.filter(brand_id=brand)
+    if request.user.is_authenticated:
+        for car in cars:
+            res = car.carmarks.filter(user=request.user).exists()
+            if res:
+                car.like = True
 
     context = {
         'brand': brand,
@@ -35,6 +59,10 @@ def brand_cars(request, brand_id):
 def car_detail(request, car_id):
     car = Car.objects.get(id=car_id)
     comments = Comment.objects.filter(car=car)
+    if request.user.is_authenticated:
+        if car.carmarks.filter(user=request.user).exists():
+            car.like = True
+
     context = {
         "car": car,
         "brands": Brand.objects.all(),
@@ -42,7 +70,7 @@ def car_detail(request, car_id):
         'form': CommentForm(),
         'comments': comments
     }
-    return render(request, 'main/detail.html', context)
+    return render(request, 'main/car_detail.html', context)
 
 
 def add_car(request: HttpRequest):
@@ -96,14 +124,15 @@ def create_comment(request, car_id: int):
 
 
 def update_comment(request: HttpRequest, comment_id: int):
-    comment = Comment.objects.get(pk=comment_id)
-    if request.method == 'POST':
-        form = CommentForm(data=request.POST, instance=comment)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.edited = True
-            comment.save()
-            return redirect('car_detail', car_id=comment.car.id)
+    comment = get_object_or_404(Comment, id=comment_id)
+    if comment.user == request.user:
+        if request.method == 'POST':
+            form = CommentForm(data=request.POST, instance=comment)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.edited = True
+                comment.save()
+                return redirect('car_detail', car_id=comment.car.id)
 
     else:
         form = CommentForm(instance=comment)
@@ -115,10 +144,26 @@ def update_comment(request: HttpRequest, comment_id: int):
 
 @login_required(login_url='home')
 def delete_comment(request: HttpRequest, comment_id: int, car_id: int):
-    comment = Comment.objects.get(pk=comment_id)
+    comment = get_object_or_404(Comment, id=comment_id)
     if comment.user == request.user or request.user.is_superuser:
         comment.delete()
-    return redirect('car_detail', car_id=comment.car.id)
+    return redirect('car_detail', car_id=car_id)
 
 
+@login_required(login_url='home')
+def add_carmark(request, car_id: int):
+    car = get_object_or_404(Car, pk=car_id)
+    carmark, created = CarMark.objects.get_or_create(car=car, user=request.user)
+    if not created:
+        carmark.delete()
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
 
+
+@login_required(login_url='home')
+def carmark_cars(request):
+    carmarks = CarMark.objects.filter(user=request.user)
+
+    context = {
+        'carmarks': carmarks
+    }
+    return render(request, 'main/home.html', context)

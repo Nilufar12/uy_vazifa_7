@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<style>
+    .detail-wrapper { max-width: 400px; margin-left: 0; }
+
+    .detail-img-container {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .car-img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+   .fav-btn-overlay {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: 0.3s;
+        z-index: 10;
+    }
+
+    .fav-btn-overlay:hover {
+        transform: scale(1.1);
+        background: white;
+    }
+</style>
+
+<div class="detail-wrapper mt-4">
+    <div class="detail-img-container">
+        {% if car.image %}
+            <img src="{{ car.image.url }}" class="car-img" alt="{{ car.name }}">
+        {% endif %}
+
+        <a href="{% url 'add_carmark' car.id %}" class="fav-btn-overlay" style="text-decoration: none;">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="24" height="24"
+                 viewBox="0 0 24 24"
+                 fill="{% if car.like %}#e53935{% else %}none{% endif %}"
+                 stroke="{% if car.like %}#e53935{% else %}#555{% endif %}"
+                 stroke-width="2"
+                 stroke-linecap="round"
+                 stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+        </a>
+    </div>
+
+    <div class="mt-4">
+        <h1>{{ car.name }}</h1>
+        <p class="h4 text-success fw-bold">{{ car.price }} $</p>
+        <hr>
+
+        <h4>Izohlar:</h4>
+        {% if request.user.is_authenticated %}
+            <form action="{% url 'create_comment' car.id %}" method="post" class="mb-4">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary">Saqlash</button>
+            </form>
+        {% endif %}
+
+        {% for comment in comments %}
+            <div class="card p-3 my-2 shadow-sm border-0 bg-light">
+                <p class="mb-1">{{ comment.text }}</p>
+                <small class="text-muted"><b>{{ comment.user.username }}</b> | {{ comment.created }}</small>
+            </div>
+
+        {% endfor %}
+    </div>
+</div>
+{% endblock main %}

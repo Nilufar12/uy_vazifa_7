@@ -52,3 +52,10 @@ class Comment(models.Model):
     #     if self.price is not None and self.price <= 0:
     #         raise ValidationError('Narh 0dan katta bo\'lsin!!!')
 
+
+class CarMark(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='carmarks')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user.username} -> {self.car.name}'
