@@ -21,8 +21,15 @@
 <div class="container">
     {% include 'layout/navbar.html' %}
    <main>
-        {% block main %}
-       {% endblock main%}
+       {% if messages %}
+       <ul class="messages">
+           {% for message in messages %}
+           <li class="alert alert-{% if message.tags == 'error' %} danger{% else %}{{ message.tags }}{% endif %}"> {{ message }}</li>
+           {% endfor %}
+       </ul>
+       {% endif %}
+       {% block main %}
+       {% endblock main %}
    </main>
 <footer>
         {% include 'layout/footer.html' %}

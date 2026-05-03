@@ -15,6 +15,30 @@ class Brand(models.Model):
         return f'{self.pk}: {self.model}'
 
 
+class Dealer(models.Model):
+
+    MILD = [
+        ('mild_a', 'Miloddan Avvalgi'),
+        ('mild', 'Milodiy')
+    ]
+
+    full_name = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, null=True, blank=True)
+    joined_year = models.PositiveSmallIntegerField()
+    mild = models.CharField(choices=MILD, default='mild')
+
+    def __str__(self):
+        return self.full_name
+
+
+class Manufacturer(models.Model):
+    name = models.CharField(max_length=255)
+    address = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.name
+
+
 class Car(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2,
@@ -23,6 +47,8 @@ class Car(models.Model):
     image = models.ImageField(upload_to='image/', null=True, blank=True)
     video = models.FileField(upload_to='video/', null=True, blank=True,
                              validators=[FileExtensionValidator(['mp4', 'mov', 'avi'])])
+    dealer = models.ManyToManyField(Dealer, related_name='cars')
+    manufacturer = models.ForeignKey(Manufacturer, on_delete=models.SET_NULL, null=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
 
     def __str__(self):

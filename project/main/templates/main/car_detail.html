@@ -74,7 +74,26 @@
                 <button class="btn btn-primary">Saqlash</button>
             </form>
         {% endif %}
+        <div>
+            {% for dealer in car.dealer.all %}
+            <p>
+                <a href="#" class="btn btn-light">{{ dealer }}</a>
+            </p>
+            {% endfor %}
+        </div>
 
+        <div>
+            <h3>Ishlab chiqaruvchi</h3>
+            <a href="#" class="btn btn-light">{{ car.manufacturer }}</a>
+        </div>
+        <div>
+            {% if request.user.is_authenticated %}
+            <form action="{% url 'delete' car.id %}" method="post" class="mb-4">
+                {% csrf_token %}
+                <button class="btn btn-danger">O'chirish</button>
+            </form>
+            {% endif %}
+        </div>
         {% for comment in comments %}
             <div class="card p-3 my-2 shadow-sm border-0 bg-light">
                 <p class="mb-1">{{ comment.text }}</p>

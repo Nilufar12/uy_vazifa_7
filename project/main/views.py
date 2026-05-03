@@ -1,7 +1,9 @@
+import paginator
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
 from django.shortcuts import render, redirect, get_object_or_404
-
+from django.core.paginator import Paginator
 
 from .forms import CarForm, CommentForm
 from .models import Brand, Car, Comment, CarMark
@@ -29,8 +31,11 @@ def home(request: HttpRequest):
     else:
         cars = Car.objects.all()
 
+    paginator = Paginator(cars, 3)
+    page = paginator.page(request.GET.get('page', 1))
+
     context = {
-        'cars': cars,
+        'page': page,
         "brands": brands,
         'title': 'Avtosalon'
     }
@@ -45,10 +50,13 @@ def brand_cars(request, brand_id):
             res = car.carmarks.filter(user=request.user).exists()
             if res:
                 car.like = True
+    paginator = Paginator(cars, 3)
+    page = paginator.get_page(request.GET.get('page', 1))
 
     context = {
+        'page': page,
         'brand': brand,
-        'cars': cars,
+        'cars': page,
         "brands": Brand.objects.all(),
         'title': brand.model
     }
@@ -78,6 +86,7 @@ def add_car(request: HttpRequest):
         form = CarForm(data=request.POST, files=request.FILES)
         if form.is_valid():
             car = form.save()
+            messages.success(request, "Mashina muvafaqqiyatli qo'shildi!!!")
             return redirect('car_detail', car_id=car.id)
     else:
         form = CarForm()
@@ -101,10 +110,12 @@ def delete_car(request, pk):
     car = Car.objects.get(pk=pk)
     if request.method == 'POST':
         car.delete()
+        messages.success(request, "Mashina muvafaqqiyatli o\'chirildi")
         return redirect('home')
     context = {
         'car': car
     }
+    messages.error(request, "Bu mashinani o'chirmoqchimisiz!!!")
     return render(request, 'main/delete.html', context)
 
 

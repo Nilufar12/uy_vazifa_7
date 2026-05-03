@@ -7,9 +7,9 @@ from .models import Car, Brand, Comment
 class CarForm(forms.ModelForm):
     class Meta:
         model = Car
-        # fields = '__all__'
-        fields = ['name', 'price', 'color', 'image', 'video', 'brand']
-        fields = ['name', 'price', 'color', 'image', 'brand']
+        fields = '__all__'
+        # fields = ['name', 'price', 'color', 'image', 'video', 'brand', ]
+
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control'
