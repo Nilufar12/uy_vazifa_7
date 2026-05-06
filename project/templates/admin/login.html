@@ -1,0 +1,195 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Umumiy fon va animatsiyali gradient */
+    body {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Standart Django admin elementlarini yashirish yoki moslash */
+    #header, #content, .breadcrumbs, #footer { background: none !important; border: none !important; }
+    #container { background: none !important; box-shadow: none !important; width: 100%; max-width: 420px; }
+    
+    /* Login karta dizayni */
+    .login-box {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        color: #fff;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .login-box:hover {
+        transform: translateY(-5px);
+    }
+
+    /* Sarlavha */
+    .login-box h2 {
+        margin-bottom: 30px;
+        font-weight: 700;
+        font-size: 26px;
+        letter-spacing: 1px;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .login-box h2 span {
+        color: #ffeb3b; /* Qiziqarli urg'u berish uchun */
+    }
+
+    /* Input maydonlari */
+    .form-row {
+        margin-bottom: 20px;
+        text-align: left;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    .form-row label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        color: #e0e0e0;
+        font-weight: 500;
+    }
+
+    .form-row input[type="text"], 
+    .form-row input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .form-row input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #fff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Kirish tugmasi */
+    .submit-row {
+        margin-top: 30px;
+        padding: 0 !important;
+        background: none !important;
+        border: none !important;
+        text-align: center;
+    }
+
+    .submit-row input[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        background: #ffffff;
+        color: #333;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .submit-row input[type="submit"]:hover {
+        background: #ffeb3b;
+        color: #000;
+        box-shadow: 0 6px 20px rgba(255, 235, 59, 0.4);
+        transform: scale(1.02);
+    }
+
+    /* Xatolik xabarlari */
+    .errornote {
+        background: rgba(217, 83, 79, 0.8) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        color: #fff !important;
+        margin-bottom: 20px !important;
+        padding: 10px !important;
+        font-size: 14px;
+    }
+    
+    .errors input {
+        border-color: #ff6b6b !important;
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="login-box">
+    <h2>Django <span>Admin</span> Panel</h2>
+    
+    {% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+    {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+    </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+    <p class="errornote">
+        {{ error }}
+    </p>
+    {% endfor %}
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.username.errors }}
+            <label for="id_username">{% translate 'Username:' %}</label>
+            {{ form.username }}
+        </div>
+        <div class="form-row">
+            {{ form.password.errors }}
+            <label for="id_password">{% translate 'Password:' %}</label>
+            {{ form.password }}
+            <input type="hidden" name="next" value="{{ next }}">
+        </div>
+        
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+        <div class="password-reset-link" style="text-align: right; margin-top: -10px;">
+            <a href="{{ password_reset_url }}" style="color: #eee; font-size: 12px; text-decoration: none;">{% translate 'Forgot your password?' %}</a>
+        </div>
+        {% endif %}
+        
+        <div class="submit-row">
+            <input type="submit" value="{% translate 'Log in' %}">
+        </div>
+    </form>
+</div>
+{% endblock %}

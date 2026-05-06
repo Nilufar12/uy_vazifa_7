@@ -1,0 +1,116 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Login bilan bir xil jonli gradient fon */
+    body {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Django standart bloklarini tozalash */
+    #header, #content, .breadcrumbs, #footer { background: none !important; border: none !important; }
+    #container { background: none !important; box-shadow: none !important; width: 100%; max-width: 450px; }
+
+    /* Logout karta dizayni */
+    .logout-box {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        color: #fff;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    /* Muvaffaqiyatli chiqish belgisi (Icon) uchun */
+    .icon-box {
+        font-size: 50px;
+        color: #ffeb3b;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .logout-box h2 {
+        margin-bottom: 15px;
+        font-weight: 700;
+        font-size: 24px;
+        color: #ffffff;
+    }
+
+    .logout-box p {
+        font-size: 16px;
+        color: #e0e0e0;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    /* Qayta kirish tugmasi */
+    .btn-login {
+        display: inline-block;
+        width: 100%;
+        padding: 14px;
+        background: #ffffff;
+        color: #333;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+
+    .btn-login:hover {
+        background: #ffeb3b;
+        color: #000;
+        box-shadow: 0 6px 20px rgba(255, 235, 59, 0.4);
+        transform: scale(1.02);
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} logged-out{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="logout-box">
+    <div class="icon-box">🔒</div>
+
+    <h2>{% translate 'Logged out' %}</h2>
+
+    <p>{% translate "Thanks for spending some quality time with the Web site today." %}</p>
+
+    <a href="{% url 'admin:index' %}" class="btn-login">
+        {% translate 'Log in again' %}
+    </a>
+</div>
+{% endblock %}
