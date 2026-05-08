@@ -92,6 +92,12 @@ class Comment(models.Model):
     def __repr__(self):
         return f"{self.pk} : {self.text}"
 
+    def save(self,*args, **kwargs):
+        if self.pk:
+            old = Comment.objects.get(pk=self.pk)
+            if old.text != self.text:
+                self.edited =True
+        super().save(*args, **kwargs)
     # def clean(self):
     #     if self.price is not None and self.price <= 0:
     #         raise ValidationError('Narh 0dan katta bo\'lsin!!!')
